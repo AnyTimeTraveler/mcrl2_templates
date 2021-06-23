@@ -1,0 +1,38 @@
+%Bei Fehler: A possible unbounded loop can be avoided by using `regular2' or `stack' as linearisation method. 
+%--> mCRL2 GUI --> Rechtsklick auf die mcrl2-Datei --> Transformation --> zu lps %--> Haken bei "regular2" --> auf lps: Analysis --> xsim --> open
+
+%
+%grafische Simulation als lts: geht nur bei endlichen Spezifikationen
+%
+
+%
+% definition of actions 
+%
+
+act
+	ping, pong;
+	stop;
+
+%
+% definition of prozesses/Zustände
+% Schema: Zustand = Uebergang . Folgezustand + anderer möglicher Zustand
+% erweitertes Schema: Zustand(Variable: Datentyp) = Uebergang.Folgezustand(neuer Variablenwert) + anderer möglicher Zustand
+%
+proc
+	Ping(amount: Int) = 
+	
+	% ohne if-Bedingung:
+	ping.Pong(amount + 1)
+
+	% mit Bedingungen: if-Bedingung -> Uebergang.Folgezustand was passieren soll, wenn es true ist
+	% (amount < 10) -> ping.Pong(amount + 1)
+	% Zustand zum Beenden des Programms --> delta um den Endzustand zu definieren
+	+ stop.delta;
+
+	Pong(amount: Int) = pong.Ping(amount + 1);
+
+%
+% definition of actions 
+%
+init
+	Ping(0); %Zustand muss einen Anfangswert der Variable erhalten (Analog zu proc)
