@@ -1,0 +1,16 @@
+act % Moegliche Uebergaenge
+	ping;
+	pong;
+	stop;
+
+proc % Zustaende
+
+	% Zustand = Uebergang . Folge-Zustand
+	Ping = ping . Pong
+	% wenn kein Folge-Zustand, dann endet das Programm erfolgreich
+		+  stop;
+
+	% Zustand = Uebergang . Folge-Zustand
+	Pong = pong . Ping;
+
+init Ping;
