@@ -1,0 +1,18 @@
+act % Moegliche Uebergaenge
+	ping;
+	pong;
+	stop;
+
+proc % Zustaenden
+
+	% Zustand(mit variable) = Uebergang . Folge-Zustand(mit neuer Variable)
+	Ping(amount: Int) = 
+		% (if-bedingung) -> uebergang, wenn wahr
+		(amount < 10) -> ping . Pong(amount + 1)
+	% wenn kein Folge-Zustand, dann endet das Programm erfolgreich
+		+  stop;
+
+	% Zustand(mit Variable) = Uebergang . Folge-Zustand(mit neuer Variable)
+	Pong(amount: Int) = pong . Ping(amount + 1);
+
+init Ping(0);
