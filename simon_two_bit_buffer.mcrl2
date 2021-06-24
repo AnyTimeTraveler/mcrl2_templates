@@ -1,0 +1,47 @@
+act
+	read_l_0;
+	read_l_1;
+	write_l_0;
+	write_l_1;
+
+	read_r_0;
+	read_r_1;
+	write_r_0;
+	write_r_1;
+
+proc
+	OBBl = (read_l_0 . write_l_0 + read_l_1 . write_l_1) . OBBl;
+
+	OBBr = (read_r_0 . write_r_0 + read_r_1 . write_r_1) . OBBr;
+
+	TBB = OBBl || OBBr;
+
+act
+	transfer_0;
+	transfer_1;
+
+init
+	hide({
+		transfer_0,
+		transfer_1
+	},
+	block({
+		read_r_0,
+		read_r_1,
+		write_l_0,
+		write_l_1
+	},
+	allow({
+		transfer_0,
+		transfer_1,
+		read_l_0,
+		read_l_1,
+		write_r_0,
+		write_r_1
+	},
+	comm({
+		write_l_0 | read_r_0 -> transfer_0,
+		write_l_1 | read_r_1 -> transfer_1
+	},
+		TBB
+	))));
