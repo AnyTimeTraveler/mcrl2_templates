@@ -1,0 +1,46 @@
+act % Moegliche Uebergaenge
+	read_l_1;
+	read_l_0;
+	read_r_1;
+	read_r_0;
+	send_l_1;
+	send_l_0;
+	send_r_1;
+	send_r_0;
+
+	send_zero;
+	send_one;
+proc % Zustaende
+
+	% Zustand = Uebergang . Folge-Zustand
+	
+	OBBl= (read_l_0 . send_l_0 + read_l_1 . send_l_1).OBBl;
+	OBBr= (read_r_0 . send_r_0 + read_r_1 . send_r_1). OBBr;
+	% wenn kein Folge-Zustand, dann endet das Programm erfolgreich
+		
+
+	% Zustand = Uebergang . Folge-Zustand
+	
+	
+
+	TBB =
+		
+		allow({
+				send_zero,
+				send_one,
+				read_l_0,
+				read_l_1,
+				send_r_0,
+				send_r_1
+
+			},
+		comm({
+			send_l_0 | read_r_0 -> send_zero,
+			
+			send_l_1 | read_r_1 -> send_one
+			
+			},
+			OBBl || OBBr
+			));
+
+init TBB;
