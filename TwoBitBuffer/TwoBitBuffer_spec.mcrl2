@@ -1,0 +1,56 @@
+
+	%Bei Fehler: A possible unbounded loop can be avoided by using `regular2' or `stack' as linearisation method. 
+%--> mCRL2 GUI --> Rechtsklick auf die mcrl2-Datei --> Transformation --> zu lps %--> Haken bei "regular2" --> auf lps: Analysis --> xsim --> open
+
+%
+%grafische Simulation als lts: geht nur bei endlichen Spezifikationen
+%
+
+%
+% definition of actions 
+% read füllt den puffer (empfangen des Wertes, nicht das auslesen des eigenen Speichers), 
+% send ist dumm --> aus der Originalspezi der Probeklausur
+% send ist das schreiben eines Wertes --> daher hier als write bezeichnet
+%
+
+act
+	read_l_0, write_l_0, read_l_1, write_l_1;
+	read_r_0, write_r_0, read_r_1, write_r_1;
+	transfer_0, transfer_1;
+
+%
+% definition of prozesses/Zustände
+% Schema: Zustand = Uebergang . Folgezustand + anderer möglicher Zustand
+% erweitertes Schema: Zustand(Variable: Datentyp) = Uebergang.Folgezustand(neuer Variablenwert) + anderer möglicher Zustand
+%
+proc
+	OBBl = (read_l_0.write_l_0 + read_l_1.write_l_1).OBBl;
+    OBBr = (read_r_0.write_r_0 + read_r_1.write_r_1).OBBr;
+  % sollen ihre Aktionen immer parallel ausführen
+	TBB = OBBl || OBBr;	
+
+%
+% definition of actions 
+%
+init
+	% was sichtbar sein soll kommt in allow
+	allow ({
+		transfer_0, 
+		transfer_1,
+		read_l_0,
+		read_l_1,
+		write_r_0,
+		write_r_1
+	},	
+	%die interne Kommunikation soll nicht sichtbar sein
+	hide ({
+		transfer_0, 
+		transfer_1
+	},
+	%wenn ein bit bei l reingeschrieben wurde soll es an r weitergegeben werden soll
+	comm ({
+		write_l_0 | read_r_0 -> transfer_0,
+		write_l_1 | read_r_1 -> transfer_1
+	},
+		TBB 
+	)));
