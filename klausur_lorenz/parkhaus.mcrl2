@@ -1,0 +1,83 @@
+% 
+% This is a specification of a simple car park.
+% 
+
+% -----------------------------------------------------------------------------------------------------------------------
+
+% Data type specification
+sort
+    CardinalDirection = struct north | east | south | west;   % 4 directions    
+
+% Definition of some constants
+map
+    nrCars : Int;
+    maxCapacity : Int;
+
+eqn
+    nrCars = 5;                      % number of cars per entrance
+    maxCapacity = 2 * nrCars;         % maximal capacity of car park
+
+% -----------------------------------------------------------------------------------------------------------------------
+
+% 
+% Specification of an entrance gate
+% 
+
+act
+    enter : CardinalDirection;        % car enters car park
+    ready;                          % end of simulation
+
+proc
+    Entrance(cd : CardinalDirection) =
+        Entrance(cd, nrCars);
+
+    Entrance(cd : CardinalDirection, cars : Int) = 
+        (cars > 0) -> enter(cd) . Entrance(cd, cars - 1) + 
+        (cars == 0) -> ready;
+
+act
+    occupied : Int;  % the number of parked cars
+    exitCarPark;      % car leaves the car park
+
+
+proc
+    CarPark =
+        CarPark(0);
+
+    CarPark(carsInside : Int) = 
+        (carsInside < maxCapacity) -> sum cd : CardinalDirection . enter(cd) . occupied(carsInside + 1) . CarPark(carsInside + 1) +
+
+        (carsInside > 0) -> exitCarPark . occupied(carsInside - 1) . CarPark(carsInside - 1) + 
+        (carsInside == 0) -> ready;
+
+% 
+% Specification of the entire car park with its four entrances
+% 
+act
+    enterCarPark : CardinalDirection;
+    terminate;
+
+proc
+    System =
+        hide({
+            terminate
+        },
+        allow({
+            enterCarPark,
+            occupied,
+            exitCarPark,
+            terminate
+        },
+        comm({
+            enter | enter -> enterCarPark,
+            ready | ready | ready | ready | ready -> terminate
+        },
+            CarPark || Entrance(north) || Entrance(south) || Entrance(east) || Entrance(west)    % all sub-systems in parallel!                
+        )));
+
+
+% ---------------------------------------------------------------------------------------------------------------------
+
+init
+    System
+;
